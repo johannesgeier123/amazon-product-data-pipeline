@@ -32,7 +32,7 @@ def extract(**context):
         response = requests.get(url, headers=headers, params=querystring)
         response.raise_for_status()
 
-        extracted_data = response.json() #debugging
+        extracted_data = response.json()
         print("Fetched data:", extracted_data)
 
         context['ti'].xcom_push(key='raw_export', value=extracted_data)
@@ -69,7 +69,6 @@ def transform(**context):
 
 def load_data(**context):
     transformed_data = context['ti'].xcom_pull(task_ids='transform_data',key='transformed_data')
-    #df = pd.DataFrame(transformed_data)
 
     if not transformed_data:
         print("⚠️ No data to insert.")
@@ -82,9 +81,9 @@ def load_data(**context):
     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
     ON CONFLICT (asin) DO NOTHING;
     """
+
     try:
-        # Use the hook with your connection ID (must exist in Airflow)
-        pg_hook = PostgresHook(postgres_conn_id='rapidapi_amazon_data_connection')  # replace with your conn_id
+        pg_hook = PostgresHook(postgres_conn_id='rapidapi_amazon_data_connection')  
 
         for product in transformed_data:
             pg_hook.run(insert_query, parameters=(
@@ -101,8 +100,6 @@ def load_data(**context):
         print("Data inserted successfully using PostgresHook.")
     except Exception as e:
         print(f"Error inserting data using PostgresHook: {e}")
-
-
 
 
 default_args = {
