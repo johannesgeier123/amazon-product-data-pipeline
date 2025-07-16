@@ -71,7 +71,7 @@ def load_data(**context):
     transformed_data = context['ti'].xcom_pull(task_ids='transform_data',key='transformed_data')
 
     if not transformed_data:
-        print("⚠️ No data to insert.")
+        print("No data to insert.")
         return
 
     insert_query = """
